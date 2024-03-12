@@ -121,7 +121,8 @@
             color: #f2f2f2;
             padding: 10px 10px;
             border: 1px solid;
-            margin: 10px 0px
+            margin: 40px 40px;
+            float:right;
         }
 
         .heading {
@@ -137,6 +138,14 @@
         .hidden {
             display: none;
         }
+
+        .alertMessage {
+            display: flex;
+            justify-content: center;
+            font-size: 20px;
+            color: #f2f2f2;
+            font-family: serif;
+        }
     </style>
 </head>
 
@@ -144,22 +153,12 @@
 <body onload="resetFileInput()">
 
     <div class="login-page">
-        @if (isset($success))
-            <div id="alertMessage" class="alert alert-success">
-                {{ $success }}
-            </div>
-        @elseif(isset($error))
-            <div id="alertMessage" class="alert alert-danger">
-                {{ $error }}
-            </div>
-        @else
-            <div id="alertMessage"></div>
-        @endif
+        <p id="alertMessage" class="alertMessage">{{ $message }}</p>
         <a class="link" href="{{ route('csv.insert.form') }}"><i style="padding: 0px 5px;"
             class="fa fa-plus-circle"></i>CSV Import</a>
         <h3 class="heading">INSERT ORDER DETAILS</h3>
         <div class="form">
-            <form id="orderForm" action="{{ route('insert.order') }}" method="POST" enctype="multipart/form-data">
+            <form id="orderForm" action="{{ route('insert.order.web') }}" method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">

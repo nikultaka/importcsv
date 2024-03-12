@@ -122,26 +122,24 @@
             border: 1px solid;
             margin: 10px 0px
         }
+
+        .alertMessage {
+            display: flex;
+            justify-content: center;
+            font-size: 20px;
+            color: #f2f2f2;
+            font-family: serif;
+        }
     </style>
 </head>
 
 <body onload="resetFileInput()">
     <div class="login-page">
-        @if (isset($success))
-            <div id="alertMessage" class="alert alert-success">
-                {{ $success }}
-            </div>
-        @elseif(isset($error))
-            <div id="alertMessage" class="alert alert-danger">
-                {{ $error }}
-            </div>
-        @else
-            <div id="alertMessage"></div>
-        @endif
+        <p id="alertMessage" class="alertMessage">{{ $message }}</p>
         <a class="link" href="{{ route('order.insert.form') }}"><i style="padding: 0px 5px;"
                 class="fa fa-plus-circle"></i>Add Order Manually</a>
         <div class="form">
-            <form id="csvForm" action="{{ route('import.csv') }}" method="POST" enctype="multipart/form-data"
+            <form id="csvForm" action="{{ route('import.csv.web') }}" method="POST" enctype="multipart/form-data"
                 class="register-form">
                 @csrf
                 <input id="csvInput" type="file" name="csv_file" accept=".csv" required>
