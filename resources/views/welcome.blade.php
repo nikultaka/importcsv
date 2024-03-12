@@ -1,7 +1,9 @@
 <html>
 
 <head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .login-page {
             width: 360px;
@@ -122,42 +124,68 @@
             border: 1px solid;
             margin: 10px 0px
         }
-
-        .alertMessage {
-            display: flex;
-            justify-content: center;
-            font-size: 20px;
-            color: #f2f2f2;
-            font-family: serif;
-        }
     </style>
 </head>
 
 <body onload="resetFileInput()">
     <div class="login-page">
-        <p id="alertMessage" class="alertMessage">{{ $message }}</p>
         <a class="link" href="{{ route('order.insert.form') }}"><i style="padding: 0px 5px;"
                 class="fa fa-plus-circle"></i>Add Order Manually</a>
         <div class="form">
-            <form id="csvForm" action="{{ route('import.csv.web') }}" method="POST" enctype="multipart/form-data"
+            <form id="csvForm" onsubmit="return false" autocomplete="off" method="POST" enctype="multipart/form-data"
                 class="register-form">
                 @csrf
                 <input id="csvInput" type="file" name="csv_file" accept=".csv" required>
-                <button type="submit">Import CSV</button>
+                <button onclick="importCSV()" type="submit">Import CSV</button>
             </form>
         </div>
     </div>
 </body>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function resetFileInput() {
-        document.getElementById('csvForm').reset();
-        document.getElementById('csvInput').value = '';
+    function importCSV() {
+        var formData = new FormData($('#csvForm')[0]);
+        var baseUrl = window.location.origin;
+        console.log('formData:', formData)
+        console.log('BASE_URL:', baseUrl);
+        $.ajax({
+            url: baseUrl + '/api/import-csv',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: response.message
+                });
+                $('#csvForm')[0].reset();
+                $('#csvInput').val('');
+            },
+            error: function(response) {
+                Toast.fire({
+                    icon: "error",
+                    title: "something went wrong, please try after sometimes!"
+                });
+            }
+        });
     }
 
-    setTimeout(function() {
-        document.getElementById('alertMessage').style.display = 'none';
-    }, 3000);
+    function resetFileInput() {
+        $('#csvForm')[0].reset();
+        $('#csvInput').val('');
+    }
 </script>
-
 </html>
