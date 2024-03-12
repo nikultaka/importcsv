@@ -76,22 +76,19 @@ class OrderController extends Controller
                 ]);
             }
 
-            $success = "CSV file imported successfully";
-            return View::make('welcome')->with(compact('success'));
+
+            return response()->json([
+                'success' => true,
+                'message' => "CSV file imported successfully",
+                // 'data' => $currentUser_email
+            ], 201);
         } catch (Exception $e) {
-            $error = "CSV file NOT imported, Something Went Wrong!";
-            return View::make('welcome')->with(compact('error'));
+
+            return response()->json([
+                'success' => false,
+                'message' => "CSV file NOT imported, Something Went Wrong!",
+            ], 200);
         }
-    }
-
-    public function showOrderInsertForm()
-    {
-        return view('orderinsert');
-    }
-
-    public function showcsvInsertForm()
-    {
-        return view('welcome');
     }
 
     public function insertOrder(Request $request)
@@ -108,17 +105,54 @@ class OrderController extends Controller
         }
 
         if (!$valueFound) {
-            $error = "No value found in the request.";
-            return View::make('orderinsert')->with(compact('error'));
+            return response()->json([
+                'success' => false,
+                'message' => "No value found in the request.",
+            ], 200);
         }
         
         $inser_order = Order::create($data);
         if ($inser_order) {
-            $success = "Order Insert successfully";
-            return View::make('orderinsert')->with(compact('success'));
+
+            return response()->json([
+                'success' => true,
+                'message' => "Order Insert successfully",
+                'data' => $data
+            ], 201);
         } else {
-            $error = "Order NOT Inserted, Something Went Wrong!";
-            return View::make('orderinsert')->with(compact('error'));
+
+            return response()->json([
+                'success' => false,
+                'message' => "Order NOT Inserted, Something Went Wrong!",
+            ], 200);
         }
+    }
+
+    public function showOrderInsertForm()
+    {
+        $message = '';
+        return View::make('orderinsert')->with(compact('message'));
+    }
+
+    public function showcsvInsertForm()
+    {
+        $message = '';
+        return View::make('welcome')->with(compact('message'));
+    }
+    
+    public function importCsvWeb(Request $request)
+    {
+        $response = $this->importCsv($request);
+        $statusCode = $response->getStatusCode();
+        $message = $response->getData()->message;
+        return View::make('welcome')->with(compact('message'));
+    }
+
+    public function insertOrderWeb(Request $request)
+    {
+        $response = $this->insertOrder($request);
+        $statusCode = $response->getStatusCode();
+        $message = $response->getData()->message;
+        return View::make('orderinsert')->with(compact('message'));
     }
 }
