@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use League\Csv\Reader;
 use Exception;
-
+use Illuminate\Support\Facades\Redirect;
 class OrderController extends Controller
 {
     public function importCsv(Request $request)
@@ -127,32 +127,5 @@ class OrderController extends Controller
             ], 200);
         }
     }
-
-    public function showOrderInsertForm()
-    {
-        $message = '';
-        return View::make('orderinsert')->with(compact('message'));
-    }
-
-    public function showcsvInsertForm()
-    {
-        $message = '';
-        return View::make('welcome')->with(compact('message'));
-    }
     
-    public function importCsvWeb(Request $request)
-    {
-        $response = $this->importCsv($request);
-        $statusCode = $response->getStatusCode();
-        $message = $response->getData()->message;
-        return View::make('welcome')->with(compact('message'));
-    }
-
-    public function insertOrderWeb(Request $request)
-    {
-        $response = $this->insertOrder($request);
-        $statusCode = $response->getStatusCode();
-        $message = $response->getData()->message;
-        return View::make('orderinsert')->with(compact('message'));
-    }
 }

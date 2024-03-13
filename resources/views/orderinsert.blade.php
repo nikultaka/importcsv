@@ -1,8 +1,9 @@
 <html>
 
 <head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .login-page {
             width: 100%;
@@ -122,7 +123,7 @@
             padding: 10px 10px;
             border: 1px solid;
             margin: 40px 40px;
-            float:right;
+            float: right;
         }
 
         .heading {
@@ -151,14 +152,15 @@
 
 
 <body onload="resetFileInput()">
-
+    <div id="alertContainer"></div>
     <div class="login-page">
-        <p id="alertMessage" class="alertMessage">{{ $message }}</p>
+        <p id="alertMessage" class="alertMessage"></p>
         <a class="link" href="{{ route('csv.insert.form') }}"><i style="padding: 0px 5px;"
-            class="fa fa-plus-circle"></i>CSV Import</a>
+                class="fa fa-plus-circle"></i>CSV Import</a>
         <h3 class="heading">INSERT ORDER DETAILS</h3>
         <div class="form">
-            <form id="orderForm" action="{{ route('insert.order.web') }}" method="POST" enctype="multipart/form-data">
+            <form id="orderForm" onsubmit="return false" autocomplete="off" method="POST"
+                enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
@@ -492,24 +494,67 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" onclick="insertOrder()" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
             </form>
-
-
         </div>
     </div>
 </body>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function resetFileInput() {
-        document.getElementById('orderForm').reset();
+    function insertOrder() {
+        var formData = new FormData($('#orderForm')[0]);
+        var baseUrl = window.location.origin;
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+
+        $.ajax({
+            url: baseUrl + '/api/insert-order',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: response.message
+                });
+                $('#orderForm')[0].reset();
+            },
+            error: function(response) {
+                Toast.fire({
+                    icon: "error",
+                    title: "something went wrong, please try after sometimes!"
+                });
+            }
+        });
     }
 
-    setTimeout(function() {
-        document.getElementById('alertMessage').style.display = 'none';
-    }, 3000);
+    function resetFileInput() {
+        $('#orderForm')[0].reset();
+    }
 </script>
 
 </html>

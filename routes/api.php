@@ -19,10 +19,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/import-csv', [App\Http\Controllers\OrderController::class, 'importCsv'])->name('import.csv');
-Route::post('/inser-order', [App\Http\Controllers\OrderController::class, 'insertOrder'])->name('insert.order');
+Route::post('/insert-order', [App\Http\Controllers\OrderController::class, 'insertOrder'])->name('insert.order');
 
-Route::post('/import-csv-web', [App\Http\Controllers\OrderController::class, 'importCsvWeb'])->name('import.csv.web');
-Route::post('/inser-order-web', [App\Http\Controllers\OrderController::class, 'insertOrderWeb'])->name('insert.order.web');
+Route::get('/csv-insert-form', function () {
+    return view('welcome');
+})->name('csv.insert.form');
 
-Route::get('/order-insert-form', [App\Http\Controllers\OrderController::class, 'showOrderInsertForm'])->name('order.insert.form');
-Route::get('/csv-insert-form', [App\Http\Controllers\OrderController::class, 'showcsvInsertForm'])->name('csv.insert.form');
+Route::get('/order-insert-form', function () {
+    return view('orderinsert');
+})->name('order.insert.form');
