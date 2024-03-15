@@ -537,10 +537,17 @@
                         toast.onmouseleave = Swal.resumeTimer;
                     }
                 });
-                Toast.fire({
-                    icon: "success",
-                    title: response.message
-                });
+                if (response.success === true) {
+                    Toast.fire({
+                        icon: "success",
+                        title: response.message
+                    });
+                } else {
+                    Toast.fire({
+                        icon: "error",
+                        title: response.message
+                    });
+                }
                 $('#orderForm')[0].reset();
             },
             error: function(response) {
