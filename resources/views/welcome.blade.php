@@ -158,7 +158,7 @@
             success: function(response) {
                 const Toast = Swal.mixin({
                     toast: true,
-                    position: "top-end",
+                    position: "top",
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
@@ -167,10 +167,17 @@
                         toast.onmouseleave = Swal.resumeTimer;
                     }
                 });
-                Toast.fire({
-                    icon: "success",
-                    title: response.message
-                });
+                if (response.success === true) {
+                    Toast.fire({
+                        icon: "success",
+                        title: response.message
+                    });
+                } else {
+                    Toast.fire({
+                        icon: "error",
+                        title: response.message
+                    });
+                }
                 $('#csvForm')[0].reset();
                 $('#csvInput').val('');
             },
@@ -188,4 +195,5 @@
         $('#csvInput').val('');
     }
 </script>
+
 </html>
