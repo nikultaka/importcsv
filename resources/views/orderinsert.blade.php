@@ -140,21 +140,14 @@
             display: none;
         }
 
-        .alertMessage {
-            display: flex;
-            justify-content: center;
-            font-size: 20px;
-            color: #f2f2f2;
-            font-family: serif;
-        }
     </style>
 </head>
 
 
 <body onload="resetFileInput()">
+    <div id="alertDiv" class="alert" role="alert"></div>
     <div id="alertContainer"></div>
     <div class="login-page">
-        <p id="alertMessage" class="alertMessage"></p>
         <a class="link" href="{{ route('csv.insert.form') }}"><i style="padding: 0px 5px;"
                 class="fa fa-plus-circle"></i>CSV Import</a>
         <h3 class="heading">INSERT ORDER DETAILS</h3>
@@ -526,35 +519,24 @@
             processData: false,
             contentType: false,
             success: function(response) {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
                 if (response.success === true) {
-                    Toast.fire({
-                        icon: "success",
-                        title: response.message
-                    });
+                    $("#alertDiv").addClass("alert-success");
                 } else {
-                    Toast.fire({
-                        icon: "error",
-                        title: response.message
-                    });
+                    $("#alertDiv").addClass("alert-danger");
                 }
+                $("#alertDiv").html(response.message).show();
                 $('#orderForm')[0].reset();
+                setTimeout(function() {
+                    $("#alertDiv").html('').hide();
+                }, 3000);
+
             },
             error: function(response) {
-                Toast.fire({
-                    icon: "error",
-                    title: "something went wrong, please try after sometimes!"
-                });
+                $("#alertDiv").addClass("alert-danger");
+                $("#alertDiv").html('something went wrong, please try after sometimes').show();
+                setTimeout(function() {
+                    $("#alertDiv").html('').hide();
+                }, 3000);
             }
         });
     }
