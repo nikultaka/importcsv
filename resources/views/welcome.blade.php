@@ -123,11 +123,20 @@
             border: 1px solid;
             margin: 10px 0px
         }
+
+        .alert {
+            display: flex;
+            justify-content: center;
+            margin: auto;
+            width: 50%;
+        }
     </style>
 </head>
 
 <body onload="resetFileInput()">
-    <div id="alertDiv" class="alert" role="alert"></div>
+    <div>
+        <div id="alertDiv" class="alert" role="alert"></div>
+    </div>
     <div class="login-page">
         <a class="link" href="{{ route('order.insert.form') }}"><i style="padding: 0px 5px;"
                 class="fa fa-plus-circle"></i>Add Order Manually</a>

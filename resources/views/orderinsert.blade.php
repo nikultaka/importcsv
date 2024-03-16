@@ -139,6 +139,13 @@
         .hidden {
             display: none;
         }
+        
+        .alert {
+            display: flex;
+            justify-content: center;
+            margin: auto;
+            width: 50%;
+        }
 
     </style>
 </head>
