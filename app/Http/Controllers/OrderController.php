@@ -19,7 +19,7 @@ class OrderController extends Controller
 
         $file = $request->file('csv_file');
 
-        try {
+        try { 
             // Read CSV file
             $reader = Reader::createFromPath($file->getPathname(), 'r');
             $reader->setHeaderOffset(0);
