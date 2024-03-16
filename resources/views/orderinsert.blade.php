@@ -526,6 +526,7 @@
             processData: false,
             contentType: false,
             success: function(response) {
+                $('html, body').animate({scrollTop:0}, 'slow');
                 if (response.success === true) {
                     $("#alertDiv").addClass("alert-success");
                 } else {
@@ -539,6 +540,7 @@
 
             },
             error: function(response) {
+                $('html, body').animate({scrollTop:0}, 'slow');
                 $("#alertDiv").addClass("alert-danger");
                 $("#alertDiv").html('something went wrong, please try after sometimes').show();
                 setTimeout(function() {
