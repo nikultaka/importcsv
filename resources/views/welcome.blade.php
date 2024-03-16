@@ -135,7 +135,7 @@
 
 <body onload="resetFileInput()">
     <div>
-        <div id="alertDiv" class="alert" role="alert"></div>
+        <div id="alertDiv" class="alert" role="alert" style="width:96%;font-size: 10px"></div>
     </div>
     <div class="login-page">
         <a class="link" href="{{ route('order.insert.form') }}"><i style="padding: 0px 5px;"
