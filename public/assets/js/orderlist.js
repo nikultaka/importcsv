@@ -6,7 +6,7 @@ function searchOrder() {
         bDestroy: true,
         bAutoWidth: false,
         serverSide: true,
-        dom: '<"top"l<"float-right"f>>rt<"bottom"ip>',
+        dom: '<"top"l<"float-right">>rt<"bottom"ip>',
         ajax: {
             type: "POST",
             url: baseUrl + "/api/search-order",
