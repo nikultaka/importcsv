@@ -3,134 +3,19 @@
 <head>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        .login-page {
-            width: 360px;
-            padding: 8% 0 0;
-            margin: auto;
-        }
-
-        .form {
-            position: relative;
-            z-index: 1;
-            background: #FFFFFF;
-            max-width: 360px;
-            margin: 0 auto 100px;
-            padding: 45px;
-            text-align: center;
-            box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
-        }
-
-        .form input {
-            font-family: "Roboto", sans-serif;
-            outline: 0;
-            background: #f2f2f2;
-            width: 100%;
-            border: 0;
-            margin: 0 0 15px;
-            padding: 15px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .form button {
-            font-family: "Roboto", sans-serif;
-            text-transform: uppercase;
-            outline: 0;
-            background: #4CAF50;
-            width: 100%;
-            border: 0;
-            padding: 15px;
-            color: #FFFFFF;
-            font-size: 14px;
-            -webkit-transition: all 0.3 ease;
-            transition: all 0.3 ease;
-            cursor: pointer;
-        }
-
-        .form button:hover,
-        .form button:active,
-        .form button:focus {
-            background: #43A047;
-        }
-
-        .form .message {
-            margin: 15px 0 0;
-            color: #b3b3b3;
-            font-size: 12px;
-        }
-
-        .form .message a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .container:before,
-        .container:after {
-            content: "";
-            display: block;
-            clear: both;
-        }
-
-        .container .info {
-            margin: 50px auto;
-            text-align: center;
-        }
-
-        .container .info h1 {
-            margin: 0 0 15px;
-            padding: 0;
-            font-size: 36px;
-            font-weight: 300;
-            color: #1a1a1a;
-        }
-
-        .container .info span {
-            color: #4d4d4d;
-            font-size: 12px;
-        }
-
-        .container .info span a {
-            color: #000000;
-            text-decoration: none;
-        }
-
-        .container .info span .fa {
-            color: #EF3B3A;
-        }
-
-        body {
-            background: #76b852;
-            /* fallback for old browsers */
-            background: rgb(141, 194, 111);
-            background: linear-gradient(90deg, rgba(141, 194, 111, 1) 0%, rgba(118, 184, 82, 1) 50%);
-            font-family: "Roboto", sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        .link {
-            display: inline-block;
-            color: #f2f2f2;
-            padding: 10px 10px;
-            border: 1px solid;
-            margin: 10px 0px
-        }
-
-        .alert {
-            display: flex;
-            justify-content: center;
-            margin: auto;
-            width: 50%;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('assets/css/csvimport.css') }}" rel="stylesheet">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" aria-current="page" href="{{ route('order.insert.form') }}">Add Order</a>
+                    <a class="nav-link active" href="{{ route('csv.insert.form') }}">CSV Insert</a>
+                    <a class="nav-link" href="{{ route('order.list') }}">Order List</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 </head>
 
 <body onload="resetFileInput()">
@@ -138,8 +23,6 @@
         <div id="alertDiv" class="alert" role="alert" style="width:96%;font-size: 10px"></div>
     </div>
     <div class="login-page">
-        <a class="link" href="{{ route('order.insert.form') }}"><i style="padding: 0px 5px;"
-                class="fa fa-plus-circle"></i>Add Order Manually</a>
         <div class="form">
             <form id="csvForm" onsubmit="return false" autocomplete="off" method="POST" enctype="multipart/form-data"
                 class="register-form">
@@ -152,45 +35,5 @@
 </body>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function importCSV() {
-        var formData = new FormData($('#csvForm')[0]);
-        var baseUrl = window.location.origin;
-        console.log('formData:', formData)
-        console.log('BASE_URL:', baseUrl);
-        $.ajax({
-            url: baseUrl + '/api/import-csv',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success === true) {
-                    $("#alertDiv").addClass("alert-success");
-                } else {
-                    $("#alertDiv").addClass("alert-danger");
-                }
-                $("#alertDiv").html(response.message).show();
-                $('#csvForm')[0].reset();
-                $('#csvInput').val('');
-                setTimeout(function() {
-                    $("#alertDiv").html('').hide();
-                }, 3000);
-            },
-            error: function(response) {
-                $("#alertDiv").addClass("alert-danger");
-                $("#alertDiv").html('something went wrong, please try after sometimes').show();
-                setTimeout(function() {
-                    $("#alertDiv").html('').hide();
-                }, 3000);
-            }
-        });
-    }
-
-    function resetFileInput() {
-        $('#csvForm')[0].reset();
-        $('#csvInput').val('');
-    }
-</script>
-
+<script type="text/javascript" src="{{ asset('assets/js/csvimport.js') }}"></script>
 </html>

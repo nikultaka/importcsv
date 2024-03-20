@@ -3,160 +3,26 @@
 <head>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        .login-page {
-            width: 100%;
-            padding: 8% 0 0;
-            margin: auto;
-        }
-
-        .form {
-            position: relative;
-            z-index: 1;
-            background: #FFFFFF;
-            max-width: 95%;
-            margin: 0 auto 100px;
-            padding: 45px;
-            text-align: center;
-            box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
-        }
-
-        .form input {
-            font-family: "Roboto", sans-serif;
-            outline: 0;
-            background: #f2f2f2;
-            width: 100%;
-            border: 0;
-            margin: 0 0 15px;
-            padding: 15px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .form button {
-            font-family: "Roboto", sans-serif;
-            text-transform: uppercase;
-            outline: 0;
-            background: #4CAF50;
-            width: 100%;
-            border: 0;
-            padding: 15px;
-            color: #FFFFFF;
-            font-size: 14px;
-            -webkit-transition: all 0.3 ease;
-            transition: all 0.3 ease;
-            cursor: pointer;
-        }
-
-        .form button:hover,
-        .form button:active,
-        .form button:focus {
-            background: #43A047;
-        }
-
-        .form .message {
-            margin: 15px 0 0;
-            color: #b3b3b3;
-            font-size: 12px;
-        }
-
-        .form .message a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .container:before,
-        .container:after {
-            content: "";
-            display: block;
-            clear: both;
-        }
-
-        .container .info {
-            margin: 50px auto;
-            text-align: center;
-        }
-
-        .container .info h1 {
-            margin: 0 0 15px;
-            padding: 0;
-            font-size: 36px;
-            font-weight: 300;
-            color: #1a1a1a;
-        }
-
-        .container .info span {
-            color: #4d4d4d;
-            font-size: 12px;
-        }
-
-        .container .info span a {
-            color: #000000;
-            text-decoration: none;
-        }
-
-        .container .info span .fa {
-            color: #EF3B3A;
-        }
-
-        body {
-            background: #76b852;
-            /* fallback for old browsers */
-            background: rgb(141, 194, 111);
-            background: linear-gradient(90deg, rgba(141, 194, 111, 1) 0%, rgba(118, 184, 82, 1) 50%);
-            font-family: "Roboto", sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        .link {
-            display: inline-block;
-            color: #f2f2f2;
-            padding: 10px 10px;
-            border: 1px solid;
-            margin: 40px 40px;
-            float: right;
-        }
-
-        .heading {
-            display: flex;
-            justify-content: center;
-            padding: 10px 10px;
-            color: #f2f2f2;
-            font-size: 50px;
-            font-weight: 600;
-            font-family: serif;
-        }
-
-        .hidden {
-            display: none;
-        }
-        
-        .alert {
-            display: flex;
-            justify-content: center;
-            margin: auto;
-            width: 50%;
-        }
-
-    </style>
+    <link href="{{ asset('assets/css/orderinsert.css') }}" rel="stylesheet">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link active" aria-current="page" href="{{ route('order.insert.form') }}">Add Order</a>
+                    <a class="nav-link" href="{{ route('csv.insert.form') }}">CSV Insert</a>
+                    <a class="nav-link" href="{{ route('order.list') }}">Order List</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 </head>
-
 
 <body onload="resetFileInput()">
     <div id="alertDiv" class="alert" role="alert"></div>
     <div id="alertContainer"></div>
     <div class="login-page">
-        <a class="link" href="{{ route('csv.insert.form') }}"><i style="padding: 0px 5px;"
-                class="fa fa-plus-circle"></i>CSV Import</a>
         <h3 class="heading">INSERT ORDER DETAILS</h3>
         <div class="form">
             <form id="orderForm" onsubmit="return false" autocomplete="off" method="POST"
@@ -503,56 +369,5 @@
 </body>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function insertOrder() {
-        var formData = new FormData($('#orderForm')[0]);
-        var baseUrl = window.location.origin;
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-            }
-        });
-
-        $.ajax({
-            url: baseUrl + '/api/insert-order',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                $('html, body').animate({scrollTop:0}, 'slow');
-                if (response.success === true) {
-                    $("#alertDiv").addClass("alert-success");
-                } else {
-                    $("#alertDiv").addClass("alert-danger");
-                }
-                $("#alertDiv").html(response.message).show();
-                $('#orderForm')[0].reset();
-                setTimeout(function() {
-                    $("#alertDiv").html('').hide();
-                }, 3000);
-
-            },
-            error: function(response) {
-                $('html, body').animate({scrollTop:0}, 'slow');
-                $("#alertDiv").addClass("alert-danger");
-                $("#alertDiv").html('something went wrong, please try after sometimes').show();
-                setTimeout(function() {
-                    $("#alertDiv").html('').hide();
-                }, 3000);
-            }
-        });
-    }
-
-    function resetFileInput() {
-        $('#orderForm')[0].reset();
-    }
-</script>
-
+<script type="text/javascript" src="{{ asset('assets/js/orderinsert.js') }}"></script>
 </html>
