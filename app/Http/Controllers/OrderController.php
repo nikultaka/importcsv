@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use League\Csv\Reader;
 use Exception;
+use DataTables;
 use Illuminate\Support\Facades\Redirect;
 
 class OrderController extends Controller
@@ -19,7 +20,7 @@ class OrderController extends Controller
 
         $file = $request->file('csv_file');
 
-        try { 
+        try {
             // Read CSV file
             $reader = Reader::createFromPath($file->getPathname(), 'r');
             $reader->setHeaderOffset(0);
@@ -157,5 +158,49 @@ class OrderController extends Controller
                 'message' => "Order NOT Inserted, Something Went Wrong!",
             ], 200);
         }
+    }
+
+    public function searchOrder(Request $request)
+    {
+        $request->validate([
+            'searchData' => 'required',
+        ]);
+
+        $Data = $request->searchData;
+        $existingOrders = Order::where('amazon_order_id', 'like', "%$Data%")
+            ->orWhere('merchant_order_id', 'like', "%$Data%")
+            ->orWhere('shipment_id', 'like', "%$Data%")
+            ->orWhere('shipment_item_id', 'like', "%$Data%")
+            ->orWhere('amazon_order_item_id', 'like', "%$Data%")
+            ->orWhere('merchant_order_item_id', 'like', "%$Data%")
+            ->orWhere('purchase_date', 'like', "%$Data%")
+            ->orWhere('buyer_email', 'like', "%$Data%")
+            ->orWhere('buyer_name', 'like', "%$Data%")
+            ->orWhere('buyer_phone_number', 'like', "%$Data%")
+            ->orWhere('tracking_number', 'like', "%$Data%")
+            ->get();
+
+        return DataTables::of($existingOrders)
+            ->addIndexColumn()
+            ->addColumn('action', function ($row) {
+                $action = '<button style="width:120px !important;" class="btn" onclick="viewOrder(' . $row->id . ')">view Details</button>';
+                return $action;
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+
+        // if (empty($existingOrders)) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => "Orders NOT Found on: " . $Data,
+        //     ], 200);
+        // } else {
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => "Orders get successfully",
+        //         'data' => $existingOrders,
+        //     ], 201);
+        // }
+
     }
 }
