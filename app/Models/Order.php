@@ -59,5 +59,7 @@ class Order extends Model
         'fc',
         'fulfillment_channel',
         'sales_channel',
+        'Address_verified',
+        'is_view',
     ];
 }

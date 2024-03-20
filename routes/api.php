@@ -23,6 +23,8 @@ Route::post('/insert-order', [App\Http\Controllers\OrderController::class, 'inse
 Route::post('/search-order', [App\Http\Controllers\OrderController::class, 'searchOrder'])->name('search.order');
 Route::post('/order-Details', [App\Http\Controllers\OrderController::class, 'orderDetails'])->name('order.Details');
 
+Route::get('/order_id/{order_id}', [App\Http\Controllers\OrderController::class, 'getOrderById'])->name('order.ById');
+Route::post('/enter-Address', [App\Http\Controllers\OrderController::class, 'enterAddress'])->name('enter.Address');
 
 Route::get('/csv-insert-form', function () {
     return view('welcome');
@@ -35,3 +37,8 @@ Route::get('/order-insert-form', function () {
 Route::get('/order-list', function () {
     return view('orderlist');
 })->name('order.list');
+
+
+Route::get('/order-verify', function () {
+    return view('orderverify');
+})->name('order.verify');

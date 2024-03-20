@@ -87,6 +87,8 @@ class OrderController extends Controller
                             'fc' => $record['FC'],
                             'fulfillment_channel' => $record['Fulfillment Channel'],
                             'sales_channel' => $record['Sales Channel'],
+                            'Address_verified' => '',
+                            'is_view' => 0,
                         ]);
                     }
                 }
@@ -142,6 +144,8 @@ class OrderController extends Controller
                 'message' => "No value found in the request.",
             ], 200);
         }
+        $data['Address_verified'] =  null;
+        $data['is_view'] =  0;
 
         $inser_order = Order::create($data);
         if ($inser_order) {
@@ -206,7 +210,6 @@ class OrderController extends Controller
                 'message' => "Order Details get successfully",
                 'data' => $order,
             ], 201);
-
         } catch (Exception $e) {
 
             return response()->json([
@@ -214,5 +217,52 @@ class OrderController extends Controller
                 'message' => "Something Went Wrong!",
             ], 200);
         }
+    }
+
+    public function getOrderById(Request $request, $order_id)
+    {
+
+        $order = Order::where('_id', $order_id)->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => "invalid_order",
+            ], 200);
+        }
+
+        if ($order->is_view ==='1') {
+            return response()->json([
+                'success' => false,
+                'message' => "old_order",
+            ], 200);
+        }
+        $orderVerifyUrl = route('order.verify');
+        return response()->json([
+            'success' => true,
+            'message' => "new_order",
+            'verify_Address' => $orderVerifyUrl,
+        ], 201);
+    }
+
+    public function enterAddress(Request $request)
+    {
+        // Validate address fields
+        $validatedData = $request->validate([
+            'address' => 'required',
+            'address2' => 'nullable',
+            'city' => 'required',
+            'state' => 'required',
+            'zipcode' => 'required',
+        ]);
+
+        // Save address to database
+        $address = new Address($validatedData);
+        $address->save();
+
+        // Perform address verification
+        // You need to implement this logic
+
+        return response()->json(['status' => 'address_saved']);
     }
 }
