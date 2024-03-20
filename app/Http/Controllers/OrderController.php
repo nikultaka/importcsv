@@ -183,24 +183,36 @@ class OrderController extends Controller
         return DataTables::of($existingOrders)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
-                $action = '<button style="width:120px !important;" class="btn" onclick="viewOrder(' . $row->id . ')">view Details</button>';
+                $action = '<button id="actionBtn" style="width:120px !important;" class="btn" data-toggle="modal" onclick="viewOrder()" data-oid="' . $row->id . '">view Details</button>';
                 return $action;
             })
             ->rawColumns(['action'])
             ->make(true);
+    }
 
-        // if (empty($existingOrders)) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => "Orders NOT Found on: " . $Data,
-        //     ], 200);
-        // } else {
-        //     return response()->json([
-        //         'success' => true,
-        //         'message' => "Orders get successfully",
-        //         'data' => $existingOrders,
-        //     ], 201);
-        // }
+    public function orderDetails(Request $request)
+    {
 
+        $request->validate([
+            'orderId' => 'required',
+        ]);
+
+        try {
+            $orderId = $request->orderId;
+            $order = Order::find($orderId)->toArray();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Order Details get successfully",
+                'data' => $order,
+            ], 201);
+
+        } catch (Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => "Something Went Wrong!",
+            ], 200);
+        }
     }
 }
