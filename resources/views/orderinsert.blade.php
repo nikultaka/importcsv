@@ -11,7 +11,7 @@
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="nav-link active" aria-current="page" href="{{ route('order.insert.form') }}">Add Order</a>
-                    <a class="nav-link" href="{{ route('csv.insert.form') }}">CSV Insert</a>
+                    <a class="nav-link" href="{{ route('csv.insert.form') }}">CSV Import</a>
                     <a class="nav-link" href="{{ route('order.list') }}">Order List</a>
                 </div>
             </div>
