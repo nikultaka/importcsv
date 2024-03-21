@@ -5,18 +5,29 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Address;
 use League\Csv\Reader;
 use Exception;
 use DataTables;
 use Illuminate\Support\Facades\Redirect;
+use PhpParser\Node\Stmt\TryCatch;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
     public function importCsv(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'csv_file' => 'required|mimes:csv,txt',
         ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
         $file = $request->file('csv_file');
 
@@ -166,9 +177,17 @@ class OrderController extends Controller
 
     public function searchOrder(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'searchData' => 'required',
         ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
         $Data = $request->searchData;
         $existingOrders = Order::where('amazon_order_id', 'like', "%$Data%")
@@ -196,10 +215,17 @@ class OrderController extends Controller
 
     public function orderDetails(Request $request)
     {
-
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'orderId' => 'required',
         ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
         try {
             $orderId = $request->orderId;
@@ -222,7 +248,7 @@ class OrderController extends Controller
     public function getOrderById(Request $request, $order_id)
     {
 
-        $order = Order::where('_id', $order_id)->first();
+        $order = Order::where('amazon_order_id', $order_id)->first();
 
         if (!$order) {
             return response()->json([
@@ -231,38 +257,90 @@ class OrderController extends Controller
             ], 200);
         }
 
-        if ($order->is_view ==='1') {
+        if ($order->is_view === '1') {
             return response()->json([
                 'success' => false,
                 'message' => "old_order",
             ], 200);
         }
-        $orderVerifyUrl = route('order.verify');
+
         return response()->json([
             'success' => true,
             'message' => "new_order",
-            'verify_Address' => $orderVerifyUrl,
         ], 201);
     }
 
-    public function enterAddress(Request $request)
+    public function enterAddress(Request $request, $order_id)
     {
-        // Validate address fields
-        $validatedData = $request->validate([
-            'address' => 'required',
-            'address2' => 'nullable',
+        $validator = Validator::make($request->all(), [
             'city' => 'required',
             'state' => 'required',
             'zipcode' => 'required',
         ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
-        // Save address to database
-        $address = new Address($validatedData);
-        $address->save();
+        try {
+            $order = Order::where('amazon_order_id', $order_id)->first();
 
-        // Perform address verification
-        // You need to implement this logic
 
-        return response()->json(['status' => 'address_saved']);
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "invalid_order",
+                ], 200);
+            }
+
+            if ($order['is_view'] === 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "old_order",
+                ], 200);
+            }
+
+            $shippingCity = $order->shipping_city;
+            $shippingState = $order->shipping_state;
+            $shippingPostalCode = $order->shipping_postal_code;
+
+            $city = $request->city;
+            $state = $request->state;
+            $zipcode = $request->zipcode;
+
+            // address verification
+            if (isset($shippingCity) && isset($shippingState) && isset($shippingPostalCode) && $shippingCity === $city && $shippingState === $state && $shippingPostalCode === $zipcode) {
+                $addressVerified = 'yes';
+            } else {
+                $addressVerified = 'no';
+            }
+
+            $order->Address_verified = $addressVerified;
+            $order->is_view = 1;
+            $order->save();
+
+            // save address in new table
+            $data['order_id'] =  $order_id;
+            $data['city'] =  $city;
+            $data['state'] =  $state;
+            $data['zipcode'] =  $zipcode;
+
+            $inser_address = Address::create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => "address_saved",
+                'addressVerified' => $addressVerified,
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "somethig went wrong, Please try after sometime !",
+            ], 200);
+        }
     }
 }
