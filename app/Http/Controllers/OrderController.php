@@ -257,7 +257,7 @@ class OrderController extends Controller
             ], 200);
         }
 
-        if ($order->is_view === '1') {
+        if ($order->is_view === 1) {
             return response()->json([
                 'success' => false,
                 'message' => "old_order",
