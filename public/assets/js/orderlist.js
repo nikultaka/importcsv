@@ -56,13 +56,15 @@ function viewOrder() {
 
             var content = $("#orderDetailsContent");
             var fieldsHtml = "";
-
+            var keysToRemove = ["is_view", "Address_verified"];
             $.each(response.data, function (key, value) {
-                fieldsHtml +=
-                    "<p><strong>" + key + ":</strong> " + value + "</p>";
+                if (keysToRemove.indexOf(key) === -1) {
+                    fieldsHtml +=
+                        "<p><strong>" + key + ":</strong> " + value + "</p>";
+                }
             });
             content.html(fieldsHtml);
-            $('#orderDetailsModal').modal('show');
+            $("#orderDetailsModal").modal("show");
         },
         error: function (response) {
             $("html, body").animate({ scrollTop: 0 }, "slow");

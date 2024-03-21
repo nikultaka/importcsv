@@ -12,6 +12,8 @@ class Address extends Model
     protected $collection = 'address';
     protected $fillable = [
         'order_id',
+        'address',
+        'address2',
         'city',
         'state',
         'zipcode',

@@ -311,6 +311,9 @@ class OrderController extends Controller
             $city = $request->city;
             $state = $request->state;
             $zipcode = $request->zipcode;
+            $address = isset($request->address) ? $request->address : null;
+            $address2 = isset($request->address2) ? $request->address2 : null;
+
 
             // address verification
             if (isset($shippingCity) && isset($shippingState) && isset($shippingPostalCode) && $shippingCity === $city && $shippingState === $state && $shippingPostalCode === $zipcode) {
@@ -324,6 +327,8 @@ class OrderController extends Controller
             $order->save();
 
             // save address in new table
+            $data['address'] =  $address;
+            $data['address2'] =  $address2;
             $data['order_id'] =  $order_id;
             $data['city'] =  $city;
             $data['state'] =  $state;
