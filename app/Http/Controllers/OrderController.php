@@ -20,7 +20,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'csv_file' => 'required|mimes:csv,txt',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -180,7 +180,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'searchData' => 'required',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -218,7 +218,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'orderId' => 'required',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -272,23 +272,9 @@ class OrderController extends Controller
 
     public function enterAddress(Request $request, $order_id)
     {
-        $validator = Validator::make($request->all(), [
-            'city' => 'required',
-            'state' => 'required',
-            'zipcode' => 'required',
-        ]);
-        
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
 
         try {
             $order = Order::where('amazon_order_id', $order_id)->first();
-
 
             if (!$order) {
                 return response()->json([
@@ -304,31 +290,53 @@ class OrderController extends Controller
                 ], 200);
             }
 
+            $validator = Validator::make($request->all(), [
+                'city' => 'required',
+                'state' => 'required',
+                'zipcode' => [
+                    'required',
+                    function ($attribute, $value, $fail) {
+                        // Normalize the zipcode by removing hyphens
+                        $normalizedZip = str_replace('-', '', $value);
+
+                        // Check if the normalized zipcode matches either 5-digit or 9-digit format
+                        if (!preg_match('/^\d{5}(\d{4})?$/', $normalizedZip)) {
+                            $fail('The ' . $attribute . ' is invalid.');
+                        }
+                    },
+                ],
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
             $shippingCity = $order->shipping_city;
-            $shippingState = $order->shipping_state;
-            $shippingPostalCode = $order->shipping_postal_code;
 
             $city = $request->city;
             $state = $request->state;
             $zipcode = $request->zipcode;
-            $address = isset($request->address) ? $request->address : null;
-            $address2 = isset($request->address2) ? $request->address2 : null;
+            $shipping_address_1 = isset($request->shipping_address_1) ? $request->shipping_address_1 : null;
+            $shipping_address_2 = isset($request->shipping_address_2) ? $request->shipping_address_2 : null;
 
 
             // address verification
-            if (isset($shippingCity) && isset($shippingState) && isset($shippingPostalCode) && $shippingCity === $city && $shippingState === $state && $shippingPostalCode === $zipcode) {
-                $addressVerified = 'yes';
-            } else {
-                $addressVerified = 'no';
-            }
+            $shippingCity = strtolower($shippingCity);
+            $city = strtolower($city);
+
+            $addressVerified = ($shippingCity === $city) ? 'yes' : 'no';
 
             $order->Address_verified = $addressVerified;
             $order->is_view = 1;
             $order->save();
 
             // save address in new table
-            $data['address'] =  $address;
-            $data['address2'] =  $address2;
+            $data['shipping_address_1'] =  $shipping_address_1;
+            $data['shipping_address_2'] =  $shipping_address_2;
             $data['order_id'] =  $order_id;
             $data['city'] =  $city;
             $data['state'] =  $state;
